@@ -4,6 +4,11 @@ def myFunction():
     And print the answer before you return
     You can write in python2 or python3 :D
     '''
+    id=input("Enter your id:")
+    sum=0
+    for i in range(9):
+        sum+=int(id[i])
+    print(sum)
 
 
 
