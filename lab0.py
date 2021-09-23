@@ -6,11 +6,9 @@ def myFunction():
     '''
     id=input("Enter your id:")
     sum=0
-    for i in range(9):
+    for i in range(len(id)):
         sum+=int(id[i])
     print(sum)
-
-
 
 
 
@@ -20,3 +18,4 @@ def myFunction():
 
 if __name__ == '__main__':
     myFunction()
+
