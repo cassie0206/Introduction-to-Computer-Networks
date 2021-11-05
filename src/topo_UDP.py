@@ -38,16 +38,28 @@ if __name__ == '__main__':
     net.start()
     
     # iperf
-    # h1 = net.get("h1")
-    # h2 = net.get("h2")
+    h1 = net.get("h1")
+    h2 = net.get("h2")
+    h3 = net.get("h3")
+    h4 = net.get("h4")
     # Use tcpdump to record packet in background
-    # print("start to record trace in h2")
-    # h2.cmd("tcpdump -w ../out/h2_output.pcap &")
+    print("start to record trace in h4")
+    h4.cmd("tcpdump udp -w ../out/UDP_h4.pcap &")
     # Create flow via iperf
-    # print("create flow via iperf")
+    print("create flow via iperf")
     # TCP flow
-    # h2.cmd("iperf -s -i 1 -t 5 -p 7777 > ../out/result_s.txt &")
-    # h1.cmd("iperf -c " + str(h2.IP()) + " -i 1 -t 5 -p 7777 > ../out/result_c.txt &")
+    h4.cmd("iperf -s -i 1 -t 5 -u -p 7777 > ../out/UDP_s_h4.txt &")
+    h1.cmd("iperf -c " + str(h4.IP()) + " -i 1 -t 5 -u -p 7777 > ../out/UDP_c_h1.txt &")
+
+    print("start to record trace in h3")
+    h3.cmd("tcpdump udp -w ../out/UDP_h3.pcap &")
+    # Create flow via iperf
+    print("create flow via iperf")
+    # TCP flow
+    h3.cmd("iperf -s -i 1 -t 5 -u -p 7777 > ../out/UDP_s_h3.txt &")
+    h2.cmd("iperf -c " + str(h3.IP()) + " -i 1 -t 5 -u -p 7777 > ../out/UDP_c_h2.txt &")
+
+
 
     CLI(net)
     net.stop()
