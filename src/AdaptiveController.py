@@ -1,3 +1,4 @@
+
 #!/usr/bin/python
 #
 # An exmaple of Ryu controller
@@ -166,8 +167,28 @@ class SimpleController(app_manager.RyuApp):
 
         # TODO section BEGIN -----------------------------------------------------
 
+        # Add forwarding rule in s1
+        #controller2
+        if msg.datapath.id == 1:
+            # For h2-h1 flow: s4 -> s1 -> s3
+            match = parser.OFPMatch(
+                in_port=1,
+                eth_type=0x0800,
+                ipv4_src="10.0.0.1",
+                ipv4_dst="10.0.0.2"
+                )
+            actions = [parser.OFPActionOutput(2)]
+            self.add_flow(
+                datapath=datapath,
+                priority=3,
+                match=match,
+                actions=actions,
+                hard_timeout=20)
+
+
 	    # Add forwarding rule in s2
         if msg.datapath.id == 2:
+            # Simplecontroller
             # For h2-h1 flow: s4 -> s2 -> h1
             match = parser.OFPMatch(
                 in_port=2,
@@ -182,9 +203,74 @@ class SimpleController(app_manager.RyuApp):
                 match=match,
                 actions=actions,
                 hard_timeout=60)
+            # controller1
+             # For h2-h1 flow: s3 -> s2 -> h1
+            match = parser.OFPMatch(
+                in_port=3,
+                eth_type=0x0800,
+                ipv4_src="10.0.0.2",
+                ipv4_dst="10.0.0.1"
+                )
+            actions = [parser.OFPActionOutput(1)]
+            self.add_flow(
+                datapath=datapath,
+                priority=2,
+                match=match,
+                actions=actions,
+                hard_timeout=40)
+            #controller2
+             # For h2-h1 flow: s3 -> s2 -> h1
+            match = parser.OFPMatch(
+                in_port=3,
+                eth_type=0x0800,
+                ipv4_src="10.0.0.2",
+                ipv4_dst="10.0.0.1"
+                )
+            actions = [parser.OFPActionOutput(1)]
+            self.add_flow(
+                datapath=datapath,
+                priority=3,
+                match=match,
+                actions=actions,
+                hard_timeout=20)
+
+
+             # Add forwarding rule in s3
+             #controller1
+        if msg.datapath.id == 3:
+            # For h2-h1 flow: s4 -> s3 -> s2
+            match = parser.OFPMatch(
+                in_port=1,
+                eth_type=0x0800,
+                ipv4_src="10.0.0.2",
+                ipv4_dst="10.0.0.1"
+                )
+            actions = [parser.OFPActionOutput(3)]
+            self.add_flow(
+                datapath=datapath,
+                priority=2,
+                match=match,
+                actions=actions,
+                hard_timeout=40)
+            #controller2
+             # For h2-h1 flow: s1 -> s3 -> s2
+            match = parser.OFPMatch(
+                in_port=2,
+                eth_type=0x0800,
+                ipv4_src="10.0.0.1",
+                ipv4_dst="10.0.0.2"
+                )
+            actions = [parser.OFPActionOutput(3)]
+            self.add_flow(
+                datapath=datapath,
+                priority=3,
+                match=match,
+                actions=actions,
+                hard_timeout=20)
 
         # Add forwarding rule in s4
         if msg.datapath.id == 4:
+            # SimpleController
             # For h2-h1 flow: h2 -> s4 -> s2
             match = parser.OFPMatch(
                 in_port=1,
@@ -199,27 +285,8 @@ class SimpleController(app_manager.RyuApp):
                 match=match,
                 actions=actions,
                 hard_timeout=60)
-
-        # Add forwarding rule in s2
-        if msg.datapath.id == 2:          
-             # For h2-h1 flow: s4 -> s3 -> s2 -> h1
-            match = parser.OFPMatch(
-                in_port=3,
-                eth_type=0x0800,
-                ipv4_src="10.0.0.2",
-                ipv4_dst="10.0.0.1"
-                )
-            actions = [parser.OFPActionOutput(1)]
-            self.add_flow(
-                datapath=datapath,
-                priority=2,
-                match=match,
-                actions=actions,
-                hard_timeout=40)
-
-        # Add forwarding rule in s4
-        if msg.datapath.id == 4:
-            # For h2-h1 flow: h2 -> s4 -> s3 -> s2
+            #controller1
+             # For h2-h1 flow: h2 -> s4 -> s3
             match = parser.OFPMatch(
                 in_port=1,
                 eth_type=0x0800,
@@ -233,44 +300,8 @@ class SimpleController(app_manager.RyuApp):
                 match=match,
                 actions=actions,
                 hard_timeout=40)
-
-        # Add forwarding rule in s3
-        if msg.datapath.id == 3:
-            # For h2-h1 flow: h2 -> s4 -> s3 -> s2
-            match = parser.OFPMatch(
-                in_port=1,
-                eth_type=0x0800,
-                ipv4_src="10.0.0.2",
-                ipv4_dst="10.0.0.1"
-                )
-            actions = [parser.OFPActionOutput(3)]
-            self.add_flow(
-                datapath=datapath,
-                priority=2,
-                match=match,
-                actions=actions,
-                hard_timeout=40)
-
-        # Add forwarding rule in s2
-        if msg.datapath.id == 2:
-            # For h2-h1 flow: s4 -> s1 -> s3 -> s2 -> h1
-            match = parser.OFPMatch(
-                in_port=3,
-                eth_type=0x0800,
-                ipv4_src="10.0.0.2",
-                ipv4_dst="10.0.0.1"
-                )
-            actions = [parser.OFPActionOutput(1)]
-            self.add_flow(
-                datapath=datapath,
-                priority=3,
-                match=match,
-                actions=actions,
-                hard_timeout=20)
-
-        # Add forwarding rule in s4
-        if msg.datapath.id == 4:
-            # For h2-h1 flow: h2 -> s4 -> s1 -> s3 -> s2 
+            #controller2
+              # For h2-h1 flow: h2 -> s4 -> s1
             match = parser.OFPMatch(
                 in_port=1,
                 eth_type=0x0800,
@@ -284,40 +315,7 @@ class SimpleController(app_manager.RyuApp):
                 match=match,
                 actions=actions,
                 hard_timeout=20)
-
-         # Add forwarding rule in s1
-        if msg.datapath.id == 1:
-            # For h2-h1 flow: h2 -> s4 -> s1 -> s3 -> s2 
-            match = parser.OFPMatch(
-                in_port=1,
-                eth_type=0x0800,
-                ipv4_src="10.0.0.2",
-                ipv4_dst="10.0.0.1"
-                )
-            actions = [parser.OFPActionOutput(2)]
-            self.add_flow(
-                datapath=datapath,
-                priority=3,
-                match=match,
-                actions=actions,
-                hard_timeout=20)
-
-         # Add forwarding rule in s3
-        if msg.datapath.id == 3:
-            # For h2-h1 flow: h2 -> s4 -> s1 -> s3 -> s2 
-            match = parser.OFPMatch(
-                in_port=2,
-                eth_type=0x0800,
-                ipv4_src="10.0.0.2",
-                ipv4_dst="10.0.0.1"
-                )
-            actions = [parser.OFPActionOutput(3)]
-            self.add_flow(
-                datapath=datapath,
-                priority=3,
-                match=match,
-                actions=actions,
-                hard_timeout=20)
+           
 
         # TODO Section END ------------------------------------------------------
     
